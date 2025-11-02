@@ -68,7 +68,23 @@ class _WordDetailPageState extends State<WordDetailPage> {
         ],
       ),
     );
-    if (ok == true) { await _deleteWord(widget.wordId); if (mounted) Navigator.pop(context, true); }
+    if (ok == true) {
+      try {
+        await _deleteWord(widget.wordId);
+        if (!mounted) return;
+        // ✅ Trả về true để trang trước hiển thị SnackBar + reload
+        Navigator.pop(context, true);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi xoá: $e'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override

@@ -79,7 +79,7 @@ class _TopicListPageState extends State<TopicListPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Xoá chủ đề?'),
-        content: const Text('Thao tác không thể hoàn tác.'),
+        content: const Text('Xóa chủ đề sẽ xoá tất cả các từ trong chủ đề này và phiên luyện tập của chủ đề.Không thể hoàn tác'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -93,8 +93,33 @@ class _TopicListPageState extends State<TopicListPage> {
       ),
     );
     if (ok == true) {
-      await deleteTopic(id);
-      _reload(reset: true);
+      try {
+        await deleteTopic(id);
+        await _reload(reset: true);
+
+        // ✅ Hiển thị thông báo SnackBar
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Đã xoá chủ đề thành công'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } catch (e) {
+        // ⚠️ Báo lỗi nếu có vấn đề
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Lỗi khi xoá: $e'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
     }
   }
 

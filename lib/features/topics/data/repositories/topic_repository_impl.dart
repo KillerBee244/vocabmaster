@@ -64,4 +64,5 @@ class TopicRepositoryImpl implements TopicRepository {
 
   @override
   Future<void> delete(String id) => remote.delete(id);
+
 }

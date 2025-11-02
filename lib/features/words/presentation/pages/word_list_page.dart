@@ -72,7 +72,33 @@ class _WordListPageState extends State<WordListPage> {
         ],
       ),
     );
-    if (ok == true) { await deleteWord(id); _reload(reset: true); }
+    if (ok == true) {
+      try {
+        await deleteWord(id);
+        await _reload(reset: true);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Đã xoá từ vựng thành công'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Lỗi khi xoá: $e'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
