@@ -111,41 +111,42 @@ class _MatchingPageState extends State<MatchingPage> {
     // responsive: 3 cột dọc, 4 cột ngang
     final cross = MediaQuery.of(context).size.width > 520 ? 4 : 3;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-        title: Text('$secs giây'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.volume_up_outlined),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () {},
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: Colors.black12),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFFF8F3FF), // Tím nhạt
+            Color(0xFFF0EFFF), // Tím → xanh nhạt
+          ],
         ),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF8F3FF), // Tím nhạt
-              Color(0xFFF0EFFF), // Tím → xanh nhạt
-            ],
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
+          centerTitle: true,
+          title: Text('$secs giây'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.volume_up_outlined),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () {},
+            ),
+          ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: Colors.black12),
           ),
         ),
-        child: cards.isEmpty
+
+        body: cards.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : Padding(
                 padding: const EdgeInsets.all(12),
