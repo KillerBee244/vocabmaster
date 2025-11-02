@@ -93,7 +93,7 @@ class _WordFormPageState extends State<WordFormPage> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 700),

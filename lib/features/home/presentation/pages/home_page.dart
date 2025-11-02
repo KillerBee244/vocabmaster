@@ -52,7 +52,7 @@ class HomePage extends StatelessWidget {
       body: uid == null
           ? const Center(child: Text('Vui lòng đăng nhập'))
           : Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: ListView(
           children: [
             // ====== Khối thống kê nhanh ======
@@ -89,13 +89,16 @@ class HomePage extends StatelessWidget {
                                 label: 'Từ vựng',
                                 value: words,
                                 icon: Icons.translate)),
-                        Expanded(
-                            child: _StatCard(
-                                label: 'Buổi luyện',
-                                value: sessions,
-                                icon: Icons.school)),
                       ],
                     ),
+                    Row(
+                      children: [
+                        Expanded(child: _StatCard(label: 'Buổi luyện',
+                            value: sessions,
+                            icon: Icons.school)),
+                      ],
+                    ),
+
                     const SizedBox(height: 20),
                     Text('Bắt đầu nhanh',
                         style: Theme.of(context).textTheme.titleMedium),

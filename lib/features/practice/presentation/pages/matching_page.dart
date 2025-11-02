@@ -8,9 +8,9 @@ import '../../domain/usecases/get_random_words.dart';
 
 class _CardItem {
   final String text;
-  final int pairId;   // cùng pairId là một cặp
-  final bool isWord;  // true = từ, false = nghĩa
-  bool removed;       // đã ghép đúng → biến mất
+  final int pairId; // cùng pairId là một cặp
+  final bool isWord; // true = từ, false = nghĩa
+  bool removed; // đã ghép đúng → biến mất
   _CardItem({
     required this.text,
     required this.pairId,
@@ -33,7 +33,7 @@ class _MatchingPageState extends State<MatchingPage> {
   Timer? _tick;
 
   List<_CardItem> cards = [];
-  int? first;               // index thẻ được chọn đầu tiên
+  int? first; // index thẻ được chọn đầu tiên
   int mistakes = 0;
 
   @override
@@ -47,12 +47,16 @@ class _MatchingPageState extends State<MatchingPage> {
   Future<void> _load() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final list = await GetRandomWords()(userId: uid, topicId: widget.topicId, total: widget.total);
+    final list = await GetRandomWords()(
+      userId: uid,
+      topicId: widget.topicId,
+      total: widget.total,
+    );
 
     final tmp = <_CardItem>[];
     for (var i = 0; i < list.length; i++) {
       final w = list[i];
-      tmp.add(_CardItem(text: w.word,    pairId: i, isWord: true));
+      tmp.add(_CardItem(text: w.word, pairId: i, isWord: true));
       tmp.add(_CardItem(text: w.meaning, pairId: i, isWord: false));
     }
     tmp.shuffle();
@@ -91,7 +95,10 @@ class _MatchingPageState extends State<MatchingPage> {
       builder: (_) => _DoneSheet(
         secs: sw.elapsed.inSeconds,
         mistakes: mistakes,
-        onReplay: () { Navigator.pop(context); Navigator.pop(context); },
+        onReplay: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
       ),
     );
   }
@@ -106,74 +113,105 @@ class _MatchingPageState extends State<MatchingPage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
         centerTitle: true,
         title: Text('$secs giây'),
         actions: [
-          IconButton(icon: const Icon(Icons.volume_up_outlined), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.settings_outlined), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.volume_up_outlined),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () {},
+          ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(height: 1, color: Colors.black12),
         ),
       ),
-      body: cards.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: cross, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 3/4,
-                ),
-                itemCount: cards.length,
-                itemBuilder: (_, i) {
-                  final c = cards[i];
-                  if (c.removed) return const SizedBox.shrink();
-
-                  final selected = first == i;
-
-                  return _Tile(
-                    text: c.text,
-                    selected: selected,
-                    onTap: done ? null : () async {
-                      if (first == null) {
-                        setState(() => first = i);
-                        return;
-                      }
-                      if (first == i) {
-                        setState(() => first = null);
-                        return;
-                      }
-
-                      final prev = first!;
-                      setState(() => first = null);
-
-                      if (_isPair(prev, i)) {
-                        setState(() {
-                          cards[prev].removed = true;
-                          cards[i].removed = true;
-                        });
-                        if (cards.every((e) => e.removed)) {
-                          await _finish();
-                        }
-                      } else {
-                        mistakes++;
-                        // flash đỏ nhanh
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sai cặp! Hãy thử lại'), duration: Duration(milliseconds: 500)),
-                        );
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF8F3FF), // Tím nhạt
+              Color(0xFFF0EFFF), // Tím → xanh nhạt
+            ],
+          ),
         ),
+        child: cards.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: cross,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                          childAspectRatio: 3 / 4,
+                        ),
+                        itemCount: cards.length,
+                        itemBuilder: (_, i) {
+                          final c = cards[i];
+                          if (c.removed) return const SizedBox.shrink();
+
+                          final selected = first == i;
+
+                          return _Tile(
+                            text: c.text,
+                            selected: selected,
+                            onTap: done
+                                ? null
+                                : () async {
+                                    if (first == null) {
+                                      setState(() => first = i);
+                                      return;
+                                    }
+                                    if (first == i) {
+                                      setState(() => first = null);
+                                      return;
+                                    }
+
+                                    final prev = first!;
+                                    setState(() => first = null);
+
+                                    if (_isPair(prev, i)) {
+                                      setState(() {
+                                        cards[prev].removed = true;
+                                        cards[i].removed = true;
+                                      });
+                                      if (cards.every((e) => e.removed)) {
+                                        await _finish();
+                                      }
+                                    } else {
+                                      mistakes++;
+                                      // flash đỏ nhanh
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Sai cặp! Hãy thử lại'),
+                                          duration: Duration(milliseconds: 500),
+                                        ),
+                                      );
+                                    }
+                                  },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -198,12 +236,22 @@ class _Tile extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: const Offset(0, 3))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(10),
-            child: Text(text, textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
         ),
       ),
@@ -215,25 +263,38 @@ class _DoneSheet extends StatelessWidget {
   final int secs;
   final int mistakes;
   final VoidCallback onReplay;
-  const _DoneSheet({required this.secs, required this.mistakes, required this.onReplay});
+  const _DoneSheet({
+    required this.secs,
+    required this.mistakes,
+    required this.onReplay,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.emoji_events, size: 48),
             const SizedBox(height: 8),
-            const Text('Chúc mừng! Bạn đã hoàn thành', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Chúc mừng! Bạn đã hoàn thành',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Text('$secs giây • Lỗi: $mistakes', style: const TextStyle(fontSize: 16)),
+            Text(
+              '$secs giây • Lỗi: $mistakes',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onReplay,
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48), shape: const StadiumBorder()),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                shape: const StadiumBorder(),
+              ),
               child: const Text('Chơi lại'),
             ),
           ],

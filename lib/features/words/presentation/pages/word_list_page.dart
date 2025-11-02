@@ -95,7 +95,7 @@ class _WordListPageState extends State<WordListPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: Column(
           children: [
             TextField(

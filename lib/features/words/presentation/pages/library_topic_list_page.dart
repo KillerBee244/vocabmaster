@@ -92,52 +92,67 @@ class _LibraryTopicListPageState extends State<LibraryTopicListPage> {
       ),
       bottomNavigationBar: const BottomNav(selected: 2),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: Column(
           children: [
             // 🔍 Thanh tìm kiếm và lọc
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Tìm theo tên / mô tả',
+                // HÀNG 1: Ô tìm kiếm
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: 'Tìm theo tên / mô tả',
+                        ),
+                        onChanged: (v) => setState(() => keyword = v),
+                      ),
                     ),
-                    onChanged: (v) => setState(() => keyword = v),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedLevel,
-                    decoration: const InputDecoration(labelText: 'Độ khó'),
-                    items: levels
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (v) async {
-                      selectedLevel = v ?? 'Tất cả';
-                      await _reload(reset: true);
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedLanguage,
-                    decoration: const InputDecoration(labelText: 'Ngôn ngữ'),
-                    items: langs
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (v) async {
-                      selectedLanguage = v ?? 'Tất cả';
-                      await _reload(reset: true);
-                    },
-                  ),
+                const SizedBox(height: 12),
+
+                // HÀNG 2: 2 ô lọc (Độ khó + Ngôn ngữ)
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedLevel,
+                        decoration: const InputDecoration(labelText: 'Độ khó'),
+                        items: levels
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) async {
+                          selectedLevel = v ?? 'Tất cả';
+                          await _reload(reset: true);
+                          setState(() {}); // đảm bảo UI cập nhật
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedLanguage,
+                        decoration: const InputDecoration(labelText: 'Ngôn ngữ'),
+                        items: langs
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (v) async {
+                          selectedLanguage = v ?? 'Tất cả';
+                          await _reload(reset: true);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+
             const SizedBox(height: 12),
 
             // 📄 Phân trang

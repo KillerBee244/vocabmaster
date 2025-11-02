@@ -23,8 +23,8 @@ class TopicListPage extends StatefulWidget {
 }
 
 class _TopicListPageState extends State<TopicListPage> {
-  final levels = const ['Tất cả','Beginner','Intermediate','Advanced'];
-  final langs  = const ['Tất cả','EN','JP','FR','DE','ZH','KR','VI'];
+  final levels = const ['Tất cả', 'Beginner', 'Intermediate', 'Advanced'];
+  final langs = const ['Tất cả', 'EN', 'JP', 'FR', 'DE', 'ZH', 'KR', 'VI'];
   String selectedLevel = 'Tất cả';
   String selectedLanguage = 'Tất cả';
   String keyword = '';
@@ -50,7 +50,12 @@ class _TopicListPageState extends State<TopicListPage> {
   Future<void> _reload({bool reset = false}) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    if (reset) { page = 1; _pageStack..clear()..add(null); }
+    if (reset) {
+      page = 1;
+      _pageStack
+        ..clear()
+        ..add(null);
+    }
     final res = await getPage(
       userId: uid,
       level: selectedLevel,
@@ -76,18 +81,31 @@ class _TopicListPageState extends State<TopicListPage> {
         title: const Text('Xoá chủ đề?'),
         content: const Text('Thao tác không thể hoàn tác.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Huỷ')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Xoá')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Huỷ'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Xoá'),
+          ),
         ],
       ),
     );
-    if (ok == true) { await deleteTopic(id); _reload(reset: true); }
+    if (ok == true) {
+      await deleteTopic(id);
+      _reload(reset: true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = search(_cache,
-        keyword: keyword, level: selectedLevel, language: selectedLanguage);
+    final filtered = search(
+      _cache,
+      keyword: keyword,
+      level: selectedLevel,
+      language: selectedLanguage,
+    );
 
     return GradientScaffold(
       appBar: AppBar(
@@ -97,7 +115,9 @@ class _TopicListPageState extends State<TopicListPage> {
             icon: const Icon(Icons.add_rounded),
             onPressed: () async {
               final ok = await Navigator.push<bool>(
-                  context, MaterialPageRoute(builder: (_) => const TopicFormPage()));
+                context,
+                MaterialPageRoute(builder: (_) => const TopicFormPage()),
+              );
               if (ok == true) _reload(reset: true);
             },
           ),
@@ -105,45 +125,89 @@ class _TopicListPageState extends State<TopicListPage> {
       ),
       bottomNavigationBar: const BottomNav(selected: 1),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: Column(
           children: [
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                    decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search), hintText: 'Tìm theo tên / mô tả'),
-                    onChanged: (v) => setState(() => keyword = v),
-                  ),
+                // HÀNG 1: Ô tìm kiếm
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.search),
+                          hintText: 'Tìm theo tên / mô tả',
+                        ),
+                        onChanged: (v) => setState(() => keyword = v),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedLevel,
-                    decoration: const InputDecoration(labelText: 'Độ khó'),
-                    items: levels.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (v) async { selectedLevel = v ?? 'Tất cả'; await _reload(reset: true); },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: selectedLanguage,
-                    decoration: const InputDecoration(labelText: 'Ngôn ngữ'),
-                    items: langs.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                    onChanged: (v) async { selectedLanguage = v ?? 'Tất cả'; await _reload(reset: true); },
-                  ),
+                const SizedBox(height: 12),
+
+                // HÀNG 2: 2 ô lọc (Độ khó + Ngôn ngữ)
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedLevel,
+                        decoration: const InputDecoration(labelText: 'Độ khó'),
+                        items: levels
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                        onChanged: (v) async {
+                          selectedLevel = v ?? 'Tất cả';
+                          await _reload(reset: true);
+                          setState(() {}); // đảm bảo UI cập nhật
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        value: selectedLanguage,
+                        decoration: const InputDecoration(
+                          labelText: 'Ngôn ngữ',
+                        ),
+                        items: langs
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                        onChanged: (v) async {
+                          selectedLanguage = v ?? 'Tất cả';
+                          await _reload(reset: true);
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+
             const SizedBox(height: 12),
             PaginationBar(
               canPrev: page > 1,
               canNext: lastDoc != null,
-              onPrev: () async { if (page>1){ page--; await _reload(); } },
-              onNext: () async { if (lastDoc!=null){ _pageStack.add(lastDoc); page++; await _reload(); } },
+              onPrev: () async {
+                if (page > 1) {
+                  page--;
+                  await _reload();
+                }
+              },
+              onNext: () async {
+                if (lastDoc != null) {
+                  _pageStack.add(lastDoc);
+                  page++;
+                  await _reload();
+                }
+              },
               page: page,
             ),
             const SizedBox(height: 8),
@@ -151,26 +215,35 @@ class _TopicListPageState extends State<TopicListPage> {
               child: filtered.isEmpty
                   ? const Center(child: Text('Không có chủ đề'))
                   : ListView.builder(
-                itemCount: filtered.length,
-                itemBuilder: (_, i) {
-                  final (id, t) = filtered[i];
-                  final m = TopicModel(
-                    id: id, userId: t.userId, name: t.name,
-                    description: t.description, level: t.level,
-                    language: t.language, createdAt: t.createdAt, updatedAt: t.updatedAt,
-                  );
-                  return TopicCard(
-                    topic: m,
-                    onTap: () => context.push('/topics/detail/${m.id}'),
-                    onEdit: () async {
-                      final ok = await Navigator.push<bool>(
-                          context, MaterialPageRoute(builder: (_) => TopicFormPage(editing: (id, m))));
-                      if (ok == true) _reload(reset: true);
-                    },
-                    onDelete: () => _confirmDelete(id),
-                  );
-                },
-              ),
+                      itemCount: filtered.length,
+                      itemBuilder: (_, i) {
+                        final (id, t) = filtered[i];
+                        final m = TopicModel(
+                          id: id,
+                          userId: t.userId,
+                          name: t.name,
+                          description: t.description,
+                          level: t.level,
+                          language: t.language,
+                          createdAt: t.createdAt,
+                          updatedAt: t.updatedAt,
+                        );
+                        return TopicCard(
+                          topic: m,
+                          onTap: () => context.push('/topics/detail/${m.id}'),
+                          onEdit: () async {
+                            final ok = await Navigator.push<bool>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TopicFormPage(editing: (id, m)),
+                              ),
+                            );
+                            if (ok == true) _reload(reset: true);
+                          },
+                          onDelete: () => _confirmDelete(id),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

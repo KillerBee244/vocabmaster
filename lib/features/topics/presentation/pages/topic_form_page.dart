@@ -72,7 +72,7 @@ class _TopicFormPageState extends State<TopicFormPage> {
     return GradientScaffold(
       appBar: AppBar(leading: const BackButton(), title: Text(isEdit ? 'Sửa chủ đề' : 'Thêm chủ đề')),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),

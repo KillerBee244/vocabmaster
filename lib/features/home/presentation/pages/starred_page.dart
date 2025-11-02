@@ -104,7 +104,19 @@ class StarredPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Từ vựng đã đánh dấu')),
-      body: uid == null
+      body: Container(
+        // ÁP GRADIENT TÍM Ở ĐÂY
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF8F3FF), // Tím nhạt
+              Color(0xFFF0EFFF), // Tím → xanh nhạt
+            ],
+          ),
+        ),
+      child : uid == null
           ? const Center(child: Text('Vui lòng đăng nhập'))
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _starredStream(uid),
@@ -121,7 +133,7 @@ class StarredPage extends StatelessWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             itemCount: docs.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (_, i) {
@@ -150,6 +162,7 @@ class StarredPage extends StatelessWidget {
           );
         },
       ),
+      )
     );
   }
 }

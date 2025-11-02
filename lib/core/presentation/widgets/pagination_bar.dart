@@ -26,8 +26,9 @@ class PaginationBar extends StatelessWidget {
           label: const Text('Trước'),
         ),
         const SizedBox(width: 12),
+        const Spacer(), // Đẩy Text ra giữa
         Text('Trang $page', style: const TextStyle(fontWeight: FontWeight.w600)),
-        const Spacer(),
+        const Spacer(),// Đẩy nút Sau ra phải
         FilledButton.tonalIcon(
           onPressed: canNext ? onNext : null,
           icon: const Icon(Icons.chevron_right),
